@@ -46,7 +46,7 @@ public class TaskControllerTest {
         task2.setTitle("Task 2");
 
         List<Task> tasks = Arrays.asList(task1, task2);
-        
+
         Pageable pageable = PageRequest.of(0, 10); // Página 0, 10 itens por página
         Page<Task> taskPage = new PageImpl<>(tasks, pageable, tasks.size());
 
