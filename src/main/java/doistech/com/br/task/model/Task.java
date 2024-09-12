@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 public class Task {
@@ -12,8 +14,13 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "O título não pode ser nulo")
+    @Size(min = 3, message = "O título deve ter no mínimo 3 caracteres")
     private String title;
+
+    @Size(max = 500, message = "A descrição deve ter no máximo 500 caracteres")
     private String description;
+
     private String category;
     private String priority;
 

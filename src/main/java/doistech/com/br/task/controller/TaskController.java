@@ -2,10 +2,16 @@ package doistech.com.br.task.controller;
 
 import doistech.com.br.task.model.Task;
 import doistech.com.br.task.service.TaskService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -16,8 +22,23 @@ public class TaskController {
     private TaskService taskService;
 
     @GetMapping
-    public List<Task> getAllTasks() {
-        return taskService.getAllTasks();
+    public Page<Task> getAllTasks(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id,asc") String[] sort) {
+
+        List<Sort.Order> orders = new ArrayList<>();
+        if (sort[0].contains(",")) {
+            for (String sortOrder : sort) {
+                String[] _sort = sortOrder.split(",");
+                orders.add(new Sort.Order(Sort.Direction.fromString(_sort[1]), _sort[0]));
+            }
+        } else {
+            orders.add(new Sort.Order(Sort.Direction.fromString(sort[1]), sort[0]));
+        }
+
+        Pageable paging = PageRequest.of(page, size, Sort.by(orders));
+        return taskService.getAllTasks(paging);
     }
 
     @GetMapping("/{id}")
@@ -38,7 +59,7 @@ public class TaskController {
     }
 
     @PostMapping
-    public Task createTask(@RequestBody Task task) {
+    public Task createTask(@Valid @RequestBody Task task) {
         return taskService.createTask(task);
     }
 

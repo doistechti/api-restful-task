@@ -4,12 +4,18 @@ import doistech.com.br.task.model.Task;
 import doistech.com.br.task.service.TaskService;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -39,7 +45,12 @@ public class TaskControllerTest {
         Task task2 = new Task();
         task2.setTitle("Task 2");
 
-        when(taskService.getAllTasks()).thenReturn(Arrays.asList(task1, task2));
+        List<Task> tasks = Arrays.asList(task1, task2);
+        
+        Pageable pageable = PageRequest.of(0, 10); // Página 0, 10 itens por página
+        Page<Task> taskPage = new PageImpl<>(tasks, pageable, tasks.size());
+
+        when(taskService.getAllTasks(Mockito.any(Pageable.class))).thenReturn(taskPage);
 
         mockMvc.perform(get("/tasks"))
                 .andExpect(status().isOk())
